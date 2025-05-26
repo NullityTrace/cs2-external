@@ -2,7 +2,7 @@
 #include <thread>
 #include <map>
 #include <cmath>
-#include "../classes/auto_updater.hpp"
+#include "../updater/auto_updater.h"
 #include "../overlay/overlay.h"
 
 std::map<std::string, int> boneMap = {
@@ -108,12 +108,7 @@ void CGame::loop() {
 		player.entity = process->read<uintptr_t>(list_entry + 120 * (playerIndex & 0x1FF));
 		if (!player.entity) continue;
 
-		/**
-		* Skip rendering your own character and teammates
-		*
-		* If you really want you can exclude your own character from the check but
-		* since you are in the same team as yourself it will be excluded anyway
-		**/
+		
 		player.team = process->read<int>(player.entity + updater::offsets::m_iTeamNum);
 		if (overlay::teamEsp && (player.team == localTeam)) continue;
 

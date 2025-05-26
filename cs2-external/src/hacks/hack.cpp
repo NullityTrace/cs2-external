@@ -2,11 +2,12 @@
 #include <thread>
 #include <cmath>
 #include "reader.h"
-#include "../classes/render.hpp"
+#include "../gui/gui.h"
 #include "../helpers/globals.h"
 #include "../Include/imgui/imgui.h"
 #include "../Include/imgui/imgui_internal.h"
 #include "../overlay/overlay.h"
+#include "../helpers/utils.h"
 
 namespace hack {
 	std::vector<std::pair<std::string, std::string>> boneConnections = {
@@ -31,6 +32,10 @@ namespace hack {
 
 		std::lock_guard<std::mutex> lock(reader_mutex);
 
+		if (overlay::c4Esp) {
+
+		}
+
 		if (g_game.isC4Planted)
 		{
 			Vector3 c4Origin = g_game.c4.get_origin();
@@ -42,9 +47,8 @@ namespace hack {
 
 				float height = 10 - c4RoundedDistance;
 				float width = height * 1.4f;
-
-				render::DrawFilledBox(
-					g::hdcBuffer,
+				
+				gui::DrawFilledBox(
 					c4ScreenPos.x - (width / 2),
 					c4ScreenPos.y - (height / 2),
 					width,
@@ -52,12 +56,11 @@ namespace hack {
 					IM_COL32(225, 75, 75, 255)
 				);
 
-				render::RenderText(
-					g::hdcBuffer,
+				gui::RenderText(
 					c4ScreenPos.x + (width / 2 + 5),
 					c4ScreenPos.y,
 					"C4",
-					config::esp_name_color,
+					overlay::esp_name_color,
 					10
 				);
 			}
@@ -88,12 +91,11 @@ namespace hack {
 			int roundedDistance = std::round(distance / 10.f);
 
 			if (overlay::dotEsp) {
-				render::DrawCircle(
-					g::hdcBuffer,
+				gui::DrawCircle(
 					player->bones.bonePositions["head"].x,
 					player->bones.bonePositions["head"].y - width / 12,
 					width / 5,
-					(g_game.localTeam == player->team ? config::esp_skeleton_color_team : config::esp_skeleton_color_enemy)
+					(g_game.localTeam == player->team ? overlay::esp_skeleton_color_team : overlay::esp_skeleton_color_enemy)
 				);
 			}
 
@@ -102,56 +104,33 @@ namespace hack {
 					const std::string& boneFrom = connection.first;
 					const std::string& boneTo = connection.second;
 
-					render::DrawLine(
-						g::hdcBuffer,
+					gui::DrawLine(
 						player->bones.bonePositions[boneFrom].x, player->bones.bonePositions[boneFrom].y,
 						player->bones.bonePositions[boneTo].x, player->bones.bonePositions[boneTo].y,
-						g_game.localTeam == player->team ? config::esp_skeleton_color_team : config::esp_skeleton_color_enemy
+						g_game.localTeam == player->team ? overlay::esp_skeleton_color_team : overlay::esp_skeleton_color_enemy
 					);
 				}
 			}
 
 			if (overlay::boxEsp)
 			{
-				render::DrawBorderBox(
-					g::hdcBuffer,
+				gui::DrawBorderBox(
 					screenHead.x - width / 2,
 					screenHead.y,
 					width,
 					height,
-					(g_game.localTeam == player->team ? config::esp_box_color_team : config::esp_box_color_enemy)
+					(g_game.localTeam == player->team ? overlay::esp_box_color_team : overlay::esp_box_color_enemy)
 				);
 			}
 
-			render::DrawBorderBox(
-				g::hdcBuffer,
-				screenHead.x - (width / 2 + 10),
-				screenHead.y + (height * (100 - player->armor) / 100),
-				2,
-				height - (height * (100 - player->armor) / 100),
-				RGB(0, 185, 255)
-			);
-
-			render::DrawBorderBox(
-				g::hdcBuffer,
-				screenHead.x - (width / 2 + 5),
-				screenHead.y + (height * (100 - player->health) / 100),
-				2,
-				height - (height * (100 - player->health) / 100),
-				RGB(
-					(255 - player->health),
-					(55 + player->health * 2),
-					75
-				)
-			);
 
 			if (overlay::nameEsp) {
-				render::RenderText(
-					g::hdcBuffer,
+
+				gui::RenderText(
 					screenHead.x + (width / 2 + 5),
 					screenHead.y,
 					player->name.c_str(),
-					config::esp_name_color,
+					overlay::esp_name_color,
 					10
 				);
 			}
@@ -161,8 +140,19 @@ namespace hack {
 				continue;
 
 			if (overlay::hpEsp) {
-				render::RenderText(
-					g::hdcBuffer,
+				gui::DrawBorderBox(
+					screenHead.x - (width / 2 + 5),
+					screenHead.y + (height * (100 - player->health) / 100),
+					2,
+					height - (height * (100 - player->health) / 100),
+					RGB(
+						(255 - player->health),
+						(55 + player->health * 2),
+						75
+					)
+				);
+
+				gui::RenderText(
 					screenHead.x + (width / 2 + 5),
 					screenHead.y + 10,
 					(std::to_string(player->health) + "hp").c_str(),
@@ -177,8 +167,16 @@ namespace hack {
 			
 
 			if (overlay::armorEsp) {
-				render::RenderText(
-					g::hdcBuffer,
+
+				gui::DrawBorderBox(
+					screenHead.x - (width / 2 + 10),
+					screenHead.y + (height * (100 - player->armor) / 100),
+					2,
+					height - (height * (100 - player->armor) / 100),
+					RGB(0, 185, 255)
+				);
+
+				gui::RenderText(
 					screenHead.x + (width / 2 + 5),
 					screenHead.y + 20,
 					(std::to_string(player->armor) + "armor").c_str(),
@@ -192,18 +190,16 @@ namespace hack {
 			}
 
 
-			render::RenderText(
-				g::hdcBuffer,
+			gui::RenderText(
 				screenHead.x + (width / 2 + 5),
 				screenHead.y + 40,
 				(std::to_string(roundedDistance) + "m away").c_str(),
-				config::esp_distance_color,
+				overlay::esp_distance_color,
 				10
 			);
 		
 			if (overlay::moneyEsp) {
-				render::RenderText(
-					g::hdcBuffer,
+				gui::RenderText(
 					screenHead.x + (width / 2 + 5),
 					screenHead.y + 50,
 					("$" + std::to_string(player->money)).c_str(),
@@ -216,12 +212,11 @@ namespace hack {
 			if (overlay::isFlashedEsp) {
 				if (player->flashAlpha > 100)
 				{
-					render::RenderText(
-						g::hdcBuffer,
+					gui::RenderText(
 						screenHead.x + (width / 2 + 5),
 						screenHead.y + 60,
 						"Player is flashed",
-						config::esp_distance_color,
+						overlay::esp_distance_color,
 						10
 					);
 				}
@@ -231,12 +226,11 @@ namespace hack {
 				if (player->is_defusing)
 				{
 					const std::string defuText = "Player is defusing";
-						render::RenderText(
-						g::hdcBuffer,
+					gui::RenderText(
 						screenHead.x + (width / 2 + 5),
 						screenHead.y + 60,
 						defuText.c_str(),
-						config::esp_distance_color,
+						overlay::esp_distance_color,
 						10
 					);
 				}

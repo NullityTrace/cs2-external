@@ -150,6 +150,9 @@
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\gui\gui.cpp" />
+    <ClCompile Include="src\hacks\hack.cpp" />
+    <ClCompile Include="src\hacks\reader.cpp" />
+    <ClCompile Include="src\memory\memory.cpp" />
     <ClCompile Include="src\overlay\overlay.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +165,11 @@
     <ClInclude Include="include\imgui\imstb_textedit.h" />
     <ClInclude Include="include\imgui\imstb_truetype.h" />
     <ClInclude Include="src\gui\gui.h" />
+    <ClInclude Include="src\hacks\reader.h" />
+    <ClInclude Include="src\helpers\globals.h" />
+    <ClInclude Include="src\helpers\vector.h" />
+    <ClInclude Include="src\memory\handle_hijack.h" />
+    <ClInclude Include="src\memory\memory.h" />
     <ClInclude Include="src\overlay\overlay.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

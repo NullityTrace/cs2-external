@@ -78,4 +78,38 @@ namespace gui {
         ImGui::EndChild();
         ImGui::End();
     }
+
+    void DrawLine(float x1, float y1, float x2, float y2, ImColor color)
+    {
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+        draw_list->AddLine(ImVec2(x1, y1), ImVec2(x2, y2), color, 2.0f); 
+    }
+
+    void DrawCircle(float x, float y, float radius, ImColor color)
+    {
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+        draw_list->AddCircle(ImVec2(x, y), radius, color, 0, 2.0f); 
+    }
+
+    void DrawBorderBox(float x, float y, float w, float h, ImColor borderColor)
+    {
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+        draw_list->AddRect(ImVec2(x, y), ImVec2(x + w, y + h), borderColor, 0.0f, 0, 2.0f); 
+    }
+
+    void DrawFilledBox(float x, float y, float width, float height, ImColor color)
+    {
+        ImDrawList* draw_list = ImGui::GetForegroundDrawList();
+        draw_list->AddRectFilled(ImVec2(x, y), ImVec2(x + width, y + height), color);
+    }
+
+
+    void RenderText(float x, float y, const char* text, ImColor textColor, float fontSize)
+    {
+        ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]); 
+        ImGui::GetForegroundDrawList()->AddText(ImVec2(x, y), textColor, text);
+        ImGui::PopFont();
+    }
+
+
 }
