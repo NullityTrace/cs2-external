@@ -1,3 +1,4 @@
 /.vs
-/cs2-external/x64/Release
-/cs2-external/x64
+/cs2-external/cs2-external/x64
+/cs2-external/cs2-external/x64/Release
+
