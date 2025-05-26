@@ -1,7 +1,9 @@
 #include <iostream>
+#include "src/overlay/overlay.h"
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	overlay::render();
+	return 0;
 }
 
