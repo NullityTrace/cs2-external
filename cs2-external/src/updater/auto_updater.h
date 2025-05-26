@@ -17,45 +17,38 @@ namespace fs = std::filesystem;
 namespace updater {
 	const std::string file_path = "offsets.json";
 
-#ifndef _UC
-	bool check_and_update(bool prompt_update);
-	bool get_last_commit_date(json& commit);
-	bool download_file(const char* url, const char* localPath);
-#endif
 	bool file_good(const std::string& name);
 
 	extern bool read();
 	extern void save();
 
-	const inline std::string github_repo_api = "https://api.github.com/repos/IMXNOOBX/cs2-external-esp/commits";
-	const inline std::string raw_updated_offets = "https://github.com/IMXNOOBX/cs2-external-esp/raw/main/offsets/offsets.json";
 
-	inline int build_number = 0;
+	inline int build_number = 14082;
 
 	namespace offsets {
-		inline std::ptrdiff_t dwLocalPlayerController = 0x0;
-		inline std::ptrdiff_t dwEntityList = 0x0;
-		inline std::ptrdiff_t dwViewMatrix = 0x0;
-		inline std::ptrdiff_t dwBuildNumber = 0x0;
-		inline std::ptrdiff_t dwPlantedC4 = 0x0;
+		inline std::ptrdiff_t dwLocalPlayerController = 27580480;
+		inline std::ptrdiff_t dwEntityList = 27258424;
+		inline std::ptrdiff_t dwViewMatrix = 27688864;
+		inline std::ptrdiff_t dwBuildNumber = 5512164;
+		inline std::ptrdiff_t dwPlantedC4 = 27709544;
 
-		inline std::ptrdiff_t m_flC4Blow = 0x0;
-		inline std::ptrdiff_t m_flNextBeep = 0x0;
-		inline std::ptrdiff_t m_flTimerLength = 0x0;
+		inline std::ptrdiff_t m_flC4Blow = 4032;
+		inline std::ptrdiff_t m_flNextBeep = 4028;
+		inline std::ptrdiff_t m_flTimerLength = 4040;
 
-		inline std::ptrdiff_t m_pInGameMoneyServices = 0x0;
-		inline std::ptrdiff_t m_iAccount = 0x0;
-		inline std::ptrdiff_t m_vecAbsOrigin = 0x0;
-		inline std::ptrdiff_t m_vOldOrigin = 0x0;
-		inline std::ptrdiff_t m_pGameSceneNode = 0x0;
-		inline std::ptrdiff_t m_flFlashOverlayAlpha = 0x0;
-		inline std::ptrdiff_t m_bIsDefusing = 0x0;
-		inline std::ptrdiff_t m_szName = 0x0;
-		inline std::ptrdiff_t m_pClippingWeapon = 0x0;
-		inline std::ptrdiff_t m_ArmorValue = 0x0;
-		inline std::ptrdiff_t m_iHealth = 0x0;
-		inline std::ptrdiff_t m_hPlayerPawn = 0x0;
-		inline std::ptrdiff_t m_sSanitizedPlayerName = 0x0;
-		inline std::ptrdiff_t m_iTeamNum = 0x0;
+		inline std::ptrdiff_t m_pInGameMoneyServices = 1824;
+		inline std::ptrdiff_t m_iAccount = 64;
+		inline std::ptrdiff_t m_vecAbsOrigin = 208;
+		inline std::ptrdiff_t m_vOldOrigin = 4900;
+		inline std::ptrdiff_t m_pGameSceneNode = 808;
+		inline std::ptrdiff_t m_flFlashOverlayAlpha = 5120;
+		inline std::ptrdiff_t m_bIsDefusing = 9194;
+		inline std::ptrdiff_t m_szName = 3360;
+		inline std::ptrdiff_t m_pClippingWeapon = 5024;
+		inline std::ptrdiff_t m_ArmorValue = 9244;
+		inline std::ptrdiff_t m_iHealth = 836;
+		inline std::ptrdiff_t m_hPlayerPawn = 2084;
+		inline std::ptrdiff_t m_sSanitizedPlayerName = 1912;
+		inline std::ptrdiff_t m_iTeamNum = 995;
 	}
 }

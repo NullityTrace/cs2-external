@@ -14,8 +14,9 @@ void read_thread() {
 
 int main()
 {
-	updater::read();
 	g_game.init();
+	updater::read();
+	
 
 
 

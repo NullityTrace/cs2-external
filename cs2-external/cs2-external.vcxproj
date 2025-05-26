@@ -152,8 +152,10 @@
     <ClCompile Include="src\gui\gui.cpp" />
     <ClCompile Include="src\hacks\hack.cpp" />
     <ClCompile Include="src\hacks\reader.cpp" />
+    <ClCompile Include="src\helpers\utils.cpp" />
     <ClCompile Include="src\memory\memory.cpp" />
     <ClCompile Include="src\overlay\overlay.cpp" />
+    <ClCompile Include="src\updater\auto_updater.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\imgui\imconfig.h" />
@@ -167,10 +169,13 @@
     <ClInclude Include="src\gui\gui.h" />
     <ClInclude Include="src\hacks\reader.h" />
     <ClInclude Include="src\helpers\globals.h" />
+    <ClInclude Include="src\helpers\utils.h" />
     <ClInclude Include="src\helpers\vector.h" />
     <ClInclude Include="src\memory\handle_hijack.h" />
     <ClInclude Include="src\memory\memory.h" />
     <ClInclude Include="src\overlay\overlay.h" />
+    <ClInclude Include="src\updater\auto_updater.h" />
+    <ClInclude Include="src\updater\json.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
