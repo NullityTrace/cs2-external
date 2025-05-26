@@ -17,12 +17,6 @@ namespace fs = std::filesystem;
 namespace updater {
 	const std::string file_path = "offsets.json";
 
-	bool file_good(const std::string& name);
-
-	extern bool read();
-	extern void save();
-
-
 	inline int build_number = 14082;
 
 	namespace offsets {

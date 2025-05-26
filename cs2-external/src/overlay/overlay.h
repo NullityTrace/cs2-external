@@ -23,12 +23,5 @@ namespace overlay
 	inline float render_distance = -1.f;
 	inline int flag_render_distance = 200;
 
-
-	inline ImColor esp_box_color_team = ImColor(75, 175, 75);       
-	inline ImColor esp_box_color_enemy = ImColor(225, 75, 75);      
-	inline ImColor esp_skeleton_color_team = ImColor(75, 175, 75);  
-	inline ImColor esp_skeleton_color_enemy = ImColor(225, 75, 75);
-	inline ImColor esp_name_color = ImColor(75, 75, 175);           
-	inline ImColor esp_distance_color = ImColor(75, 75, 175);       
 }
 #pragma once

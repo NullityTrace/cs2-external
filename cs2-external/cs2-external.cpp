@@ -14,16 +14,25 @@ void read_thread() {
 
 int main()
 {
-	g_game.init();
-	updater::read();
 	
+	try {
+		updater::read();
+		g_game.init();
+		
 
 
 
-	std::thread read(read_thread);
 
-	read.detach();
-	overlay::render();
-	return 0;
+		std::thread read(read_thread);
+
+		read.detach();
+		overlay::render();
+		return 0;
+	}
+	catch (const std::exception& e) {
+		std::cerr << "Erro capturado: " << e.what() << std::endl;
+		return 1;
+	}
+
 }
 
