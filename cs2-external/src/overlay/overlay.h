@@ -16,5 +16,8 @@ namespace overlay
 	inline bool isFlashedEsp = false;
 	inline bool isDefusingEsp = false;
 	inline bool moneyEsp = false;
+
+	inline float render_distance = -1.f;
+	inline int flag_render_distance = 200;
 }
 #pragma once
