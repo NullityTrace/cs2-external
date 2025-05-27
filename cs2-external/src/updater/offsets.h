@@ -1,34 +1,40 @@
+// offsets.h
 #pragma once
-#include <iostream>
+#include <cstdint>
 
 namespace offsets {
+    extern int build_number;
 
-	inline int build_number = 14082;
+    namespace client {
+        extern std::uintptr_t dwLocalPlayerController;
+        extern std::uintptr_t dwEntityList;
+        extern std::uintptr_t dwViewMatrix;
+        extern std::uintptr_t dwPlantedC4;
+    }
 
-	namespace offsets {
-		inline ptrdiff_t dwLocalPlayerController = 27580480;
-		inline ptrdiff_t dwEntityList = 27258424;
-		inline ptrdiff_t dwViewMatrix = 27688864;
-		inline ptrdiff_t dwBuildNumber = 5512164;
-		inline ptrdiff_t dwPlantedC4 = 27709544;
+    namespace engine {
+        extern std::uintptr_t dwBuildNumber;
+    }
 
-		inline ptrdiff_t m_flC4Blow = 4032;
-		inline ptrdiff_t m_flNextBeep = 4028;
-		inline ptrdiff_t m_flTimerLength = 4040;
+    namespace netvars {
+        extern std::uintptr_t m_flC4Blow;
+        extern std::uintptr_t m_flNextBeep;
+        extern std::uintptr_t m_flTimerLength;
+        extern std::uintptr_t m_pInGameMoneyServices;
+        extern std::uintptr_t m_iAccount;
+        extern std::uintptr_t m_vecAbsOrigin;
+        extern std::uintptr_t m_vOldOrigin;
+        extern std::uintptr_t m_pGameSceneNode;
+        extern std::uintptr_t m_flFlashOverlayAlpha;
+        extern std::uintptr_t m_bIsDefusing;
+        extern std::uintptr_t m_szName;
+        extern std::uintptr_t m_pClippingWeapon;
+        extern std::uintptr_t m_ArmorValue;
+        extern std::uintptr_t m_iHealth;
+        extern std::uintptr_t m_hPlayerPawn;
+        extern std::uintptr_t m_sSanitizedPlayerName;
+        extern std::uintptr_t m_iTeamNum;
+    }
 
-		inline ptrdiff_t m_pInGameMoneyServices = 1824;
-		inline ptrdiff_t m_iAccount = 64;
-		inline ptrdiff_t m_vecAbsOrigin = 208;
-		inline ptrdiff_t m_vOldOrigin = 4900;
-		inline ptrdiff_t m_pGameSceneNode = 808;
-		inline ptrdiff_t m_flFlashOverlayAlpha = 5120;
-		inline ptrdiff_t m_bIsDefusing = 9194;
-		inline ptrdiff_t m_szName = 3360;
-		inline ptrdiff_t m_pClippingWeapon = 5024;
-		inline ptrdiff_t m_ArmorValue = 9244;
-		inline ptrdiff_t m_iHealth = 836;
-		inline ptrdiff_t m_hPlayerPawn = 2084;
-		inline ptrdiff_t m_sSanitizedPlayerName = 1912;
-		inline ptrdiff_t m_iTeamNum = 995;
-	}
+    bool FetchOffsets();
 }
