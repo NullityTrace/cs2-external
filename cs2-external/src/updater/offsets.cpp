@@ -103,23 +103,19 @@ namespace offsets {
         if (latest_build == build_number) return false;
 
         try {
-            // Fetch remote data
             std::string offsets_data = FetchURL("https://raw.githubusercontent.com/a2x/cs2-dumper/main/output/offsets.json");
             std::string client_data = FetchURL("https://raw.githubusercontent.com/a2x/cs2-dumper/main/output/client_dll.json");
 
             json offsets_json = json::parse(offsets_data);
             json client_json = json::parse(client_data);
 
-            // Update engine offsets
             engine::dwBuildNumber = offsets_json["engine2.dll"]["dwBuildNumber"];
 
-            // Update client offsets
             client::dwLocalPlayerController = offsets_json["client.dll"]["dwLocalPlayerController"];
             client::dwEntityList = offsets_json["client.dll"]["dwEntityList"];
             client::dwViewMatrix = offsets_json["client.dll"]["dwViewMatrix"];
             client::dwPlantedC4 = offsets_json["client.dll"]["dwPlantedC4"];
 
-            // Update netvars
             auto& client_classes = client_json["client.dll"]["classes"];
             netvars::m_flC4Blow = client_classes["C_PlantedC4"]["fields"]["m_flC4Blow"];
             netvars::m_flNextBeep = client_classes["C_PlantedC4"]["fields"]["m_flNextBeep"];
@@ -139,7 +135,6 @@ namespace offsets {
             netvars::m_sSanitizedPlayerName = client_classes["CCSPlayerController"]["fields"]["m_sSanitizedPlayerName"];
             netvars::m_iTeamNum = client_classes["C_BaseEntity"]["fields"]["m_iTeamNum"];
 
-            // Update build number last on success
             build_number = latest_build;
             return true;
         }
