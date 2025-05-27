@@ -1,9 +1,16 @@
 // In main.cpp
 #include <iostream>
+#include <windows.h>
 #include "src/overlay/overlay.h"
 #include "src/updater/offsets.h"
 
 int main() {
+
+    #ifndef _DEBUG
+      HWND hwnd = GetConsoleWindow();
+      if (hwnd) ShowWindow(hwnd, SW_HIDE);
+    #endif
+
     bool updated = offsets::FetchOffsets();
 
     if (updated) {
@@ -43,6 +50,8 @@ int main() {
     std::cout << "  m_hPlayerPawn: 0x" << offsets::netvars::m_hPlayerPawn << std::endl;
     std::cout << "  m_sSanitizedPlayerName: 0x" << offsets::netvars::m_sSanitizedPlayerName << std::endl;
     std::cout << "  m_iTeamNum: 0x" << offsets::netvars::m_iTeamNum << std::endl;
+
+
 
     overlay::render();
     return 0;

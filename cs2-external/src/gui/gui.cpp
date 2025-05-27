@@ -42,7 +42,15 @@ namespace gui {
         ApplyFlatDarkPurpleTheme();
 
         ImGui::SetNextWindowSize(ImVec2(600, 400), ImGuiCond_Once);
-        ImGui::Begin("NullityTraceEsp", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+        ImGui::Begin("NullityTraceEsp", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar);
+
+        ImGui::Text("NullityTraceEsp");
+        ImGui::SameLine(); 
+        ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 29); 
+
+        if (ImGui::Button("X", ImVec2(20, 20))) {
+            exit(0); 
+        }
 
         ImGui::BeginChild("Sidebar", ImVec2(120, 0), true);
         if (ImGui::Button("Visuals", ImVec2(-1, 40))) activeTab = MenuTab::Visuals;
@@ -55,25 +63,23 @@ namespace gui {
 
         if (activeTab == MenuTab::Visuals) {
             ImGui::Text("Visual Options");
-            ImGui::Checkbox("Team ESP", &overlay::teamEsp);
             ImGui::Checkbox("Dot ESP", &overlay::dotEsp);
-            ImGui::Checkbox("Box ESP", &overlay::boxEsp);
             ImGui::Checkbox("Skeleton ESP", &overlay::skeletonEsp);
+            ImGui::Checkbox("Box ESP", &overlay::boxEsp);
+            ImGui::Checkbox("Team ESP", &overlay::teamEsp);
+            ImGui::Checkbox("Name", &overlay::nameEsp);
             ImGui::Checkbox("Health", &overlay::hpEsp);
             ImGui::Checkbox("Armor", &overlay::armorEsp);
-            ImGui::Checkbox("Name", &overlay::nameEsp);
             ImGui::Checkbox("Flashed", &overlay::isFlashedEsp);
             ImGui::Checkbox("Defusing", &overlay::isDefusingEsp);
             ImGui::Checkbox("Money", &overlay::moneyEsp);
         }
-
         else if (activeTab == MenuTab::Config) {
             ImGui::Spacing();
             ImGui::TextColored(ImVec4(0.8f, 0.5f, 1.0f, 1.0f), "Config tab is under development...");
             ImGui::Spacing();
             ImGui::Text("You will be able to save and load presets here soon!");
         }
-
 
         ImGui::EndChild();
         ImGui::End();
