@@ -2,7 +2,7 @@
 #include <windows.h>
 #include "src/overlay/overlay.h"
 #include "src/updater/offsets.h"
-#include "src/memory/handleInspector.h"
+#include "src/memory/reader.h"
 
 int main() {
 
@@ -48,8 +48,7 @@ int main() {
     std::cout << "  m_sSanitizedPlayerName: 0x" << offsets::netvars::m_sSanitizedPlayerName << std::endl;
     std::cout << "  m_iTeamNum: 0x" << offsets::netvars::m_iTeamNum << std::endl;
 
-    HandleInspector inspector;
-    inspector.FindHandlesToNotepad();
+    Reader.init();
 
 
     overlay::render();

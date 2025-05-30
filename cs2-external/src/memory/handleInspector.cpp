@@ -1,22 +1,22 @@
 #include "HandleInspector.h"
 
-
-
-DWORD HandleInspector::GetNotepadPid() {
+DWORD HandleInspector::GetPidByName(const std::wstring& processName) {
     DWORD pid = 0;
-    PROCESSENTRY32 entry = {};
-    entry.dwSize = sizeof(entry);
+    PROCESSENTRY32 entry = { sizeof(entry) };
 
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (Process32First(snapshot, &entry)) {
-        do {
-            if (_wcsicmp(entry.szExeFile, L"notepad.exe") == 0) {
-                pid = entry.th32ProcessID;
-                break;
-            }
-        } while (Process32Next(snapshot, &entry));
+    if (snapshot != INVALID_HANDLE_VALUE) {
+        if (Process32First(snapshot, &entry)) {
+            do {
+                if (_wcsicmp(entry.szExeFile, processName.c_str()) == 0) {
+                    pid = entry.th32ProcessID;
+                    break;
+                }
+            } while (Process32Next(snapshot, &entry));
+        }
+        CloseHandle(snapshot);
     }
-    CloseHandle(snapshot);
+
     return pid;
 }
 
@@ -33,26 +33,19 @@ std::wstring HandleInspector::GetProcessName(DWORD pid) {
     return L"<Unknown>";
 }
 
-void HandleInspector::FindHandlesToNotepad() {
-    DWORD notepadPid = GetNotepadPid();
-    if (!notepadPid) {
-        std::wcout << L"Notepad.exe not found." << std::endl;
-        return;
+bool HandleInspector::FindHandlesToProcess(const std::wstring& targetProcessName) {
+    DWORD targetPid = GetPidByName(targetProcessName);
+    if (!targetPid) {
+        std::wcout << L"[!] Process not found: " << targetProcessName << std::endl;
+        return false;
     }
 
-    HANDLE hNotepad = OpenProcess(PROCESS_ALL_ACCESS, FALSE, notepadPid);
-    if (!hNotepad) {
-        std::wcout << L"Failed to open notepad process." << std::endl;
-        return;
-    }
-
-    _NtQuerySystemInformation NtQuerySystemInformation = (_NtQuerySystemInformation)GetProcAddress(
-        GetModuleHandleW(L"ntdll.dll"), "NtQuerySystemInformation"
-    );
+    _NtQuerySystemInformation NtQuerySystemInformation =
+        (_NtQuerySystemInformation)GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "NtQuerySystemInformation");
 
     if (!NtQuerySystemInformation) {
-        std::wcerr << L"Failed to resolve NtQuerySystemInformation." << std::endl;
-        return;
+        std::wcerr << L"[!] Failed to resolve NtQuerySystemInformation." << std::endl;
+        return false;
     }
 
     ULONG handleInfoSize = 0x10000;
@@ -64,8 +57,6 @@ void HandleInspector::FindHandlesToNotepad() {
         handleInfo = (PSYSTEM_HANDLE_INFORMATION)realloc(handleInfo, handleInfoSize);
     }
 
-    std::map<DWORD, bool> reported;
-
     for (ULONG i = 0; i < handleInfo->HandleCount; i++) {
         SYSTEM_HANDLE h = handleInfo->Handles[i];
 
@@ -76,16 +67,21 @@ void HandleInspector::FindHandlesToNotepad() {
 
         HANDLE dupHandle = nullptr;
         if (DuplicateHandle(hProcess, (HANDLE)(uintptr_t)h.Handle,
-            GetCurrentProcess(), &dupHandle, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+            GetCurrentProcess(), &dupHandle, PROCESS_VM_READ | PROCESS_QUERY_INFORMATION, FALSE, 0)
+            ) {
 
-            DWORD targetPid = GetProcessId(dupHandle);
-            if (targetPid == notepadPid && !reported[h.ProcessId]) {
-                std::wcout << L"Process " << GetProcessName(h.ProcessId)
-                    << L" (PID: " << h.ProcessId << L") has a handle to notepad.exe" << std::endl;
-                std::wcout << L"Duplicated handle: " << dupHandle
-                    << L" | Target PID: " << targetPid << std::endl;
-                reported[h.ProcessId] = true;
+            DWORD foundPid = GetProcessId(dupHandle);
+            if (foundPid == targetPid) {
+                std::wcout << L"[+] Found duplicated handle to " << targetProcessName
+                    << L" (PID: " << foundPid << L") from process PID: " << h.ProcessId << std::endl;
+
+                duplicatedHandle_ = dupHandle;
+                duplicatedPid_ = foundPid;
+                CloseHandle(hProcess);
+                free(handleInfo);
+                return true;
             }
+
             CloseHandle(dupHandle);
         }
 
@@ -93,5 +89,21 @@ void HandleInspector::FindHandlesToNotepad() {
     }
 
     free(handleInfo);
-    CloseHandle(hNotepad);
+    return false;
 }
+
+HANDLE HandleInspector::GetDuplicatedHandle() const {
+    return duplicatedHandle_;
+}
+
+void HandleInspector::CloseDuplicatedHandle() {
+    if (duplicatedHandle_) {
+        CloseHandle(duplicatedHandle_);
+        duplicatedHandle_ = nullptr;
+    }
+}
+
+
+
+
+

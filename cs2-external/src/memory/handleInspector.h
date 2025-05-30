@@ -4,15 +4,16 @@
 #include <winternl.h>
 #include <psapi.h>
 #include <tlhelp32.h>
-#include <vector>
 #include <string>
 #include <iostream>
 #include <map>
+#include <vector>
 #include <ntstatus.h>
-#define WIN32_NO_STATUS
-
 
 #pragma comment(lib, "ntdll.lib")
+
+#define WIN32_NO_STATUS
+#define SystemHandleInformation 16
 
 typedef NTSTATUS(WINAPI* _NtQuerySystemInformation)(
     ULONG SystemInformationClass,
@@ -20,8 +21,6 @@ typedef NTSTATUS(WINAPI* _NtQuerySystemInformation)(
     ULONG SystemInformationLength,
     PULONG ReturnLength
     );
-
-#define SystemHandleInformation 16
 
 typedef struct _SYSTEM_HANDLE {
     ULONG ProcessId;
@@ -39,9 +38,18 @@ typedef struct _SYSTEM_HANDLE_INFORMATION {
 
 class HandleInspector {
 public:
-    void FindHandlesToNotepad();
+    bool FindHandlesToProcess(const std::wstring& targetProcessName);
+    HANDLE GetDuplicatedHandle() const;
+    void CloseDuplicatedHandle();
+    std::wstring GetProcessName(DWORD pid);
+    DWORD GetPidByName(const std::wstring& processName);
+    DWORD GetDuplicatedPid() const { return duplicatedPid_; } 
 
 private:
-    DWORD GetNotepadPid();
-    std::wstring GetProcessName(DWORD pid);
+    HANDLE duplicatedHandle_ = nullptr;
+    DWORD duplicatedPid_ = 0; 
 };
+
+
+
+
