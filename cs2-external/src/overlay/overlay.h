@@ -15,10 +15,6 @@ namespace overlay
 	inline bool hpEsp = false;
 	inline bool armorEsp = false;
 	inline bool nameEsp = false;
-	inline bool isFlashedEsp = false;
-	inline bool isDefusingEsp = false;
-	inline bool moneyEsp = false;
-	inline bool c4Esp = false;
 
 	inline float render_distance = -1.f;
 	inline int flag_render_distance = 200;

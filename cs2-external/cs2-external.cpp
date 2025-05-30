@@ -4,10 +4,18 @@
 #include "src/updater/offsets.h"
 #include "src/memory/reader.h"
 
+
+
+bool finish = false;
+void read_thread() {
+    while (!finish) {
+        reader.loop();
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+    }
+}
+
+
 int main() {
-
-    
-
     bool updated = offsets::FetchOffsets();
 
     if (updated) {
@@ -48,8 +56,11 @@ int main() {
     std::cout << "  m_sSanitizedPlayerName: 0x" << offsets::netvars::m_sSanitizedPlayerName << std::endl;
     std::cout << "  m_iTeamNum: 0x" << offsets::netvars::m_iTeamNum << std::endl;
 
-    Reader.init();
+    reader.init();
 
+    std::thread read(read_thread);
+
+    read.detach();
 
     overlay::render();
     return 0;

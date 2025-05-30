@@ -13,6 +13,8 @@ public:
     HANDLE handle_ = nullptr;
     HWND hwnd_ = nullptr;
 
+    bool read_raw(uintptr_t address, void* buffer, size_t size);
+
     pProcess() = default;
     pProcess(DWORD pid, HANDLE handle) : pid_(pid), handle_(handle) {}
 
