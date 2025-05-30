@@ -1,4 +1,3 @@
-// offsets.cpp
 #include "offsets.h"
 #include <iostream>
 #include <regex>

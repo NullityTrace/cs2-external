@@ -1,15 +1,12 @@
-// In main.cpp
 #include <iostream>
 #include <windows.h>
 #include "src/overlay/overlay.h"
 #include "src/updater/offsets.h"
+#include "src/memory/handleInspector.h"
 
 int main() {
 
-    #ifndef _DEBUG
-      HWND hwnd = GetConsoleWindow();
-      if (hwnd) ShowWindow(hwnd, SW_HIDE);
-    #endif
+    
 
     bool updated = offsets::FetchOffsets();
 
@@ -51,6 +48,8 @@ int main() {
     std::cout << "  m_sSanitizedPlayerName: 0x" << offsets::netvars::m_sSanitizedPlayerName << std::endl;
     std::cout << "  m_iTeamNum: 0x" << offsets::netvars::m_iTeamNum << std::endl;
 
+    HandleInspector inspector;
+    inspector.FindHandlesToNotepad();
 
 
     overlay::render();

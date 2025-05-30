@@ -70,9 +70,6 @@ namespace gui {
             ImGui::Checkbox("Name", &overlay::nameEsp);
             ImGui::Checkbox("Health", &overlay::hpEsp);
             ImGui::Checkbox("Armor", &overlay::armorEsp);
-            ImGui::Checkbox("Flashed", &overlay::isFlashedEsp);
-            ImGui::Checkbox("Defusing", &overlay::isDefusingEsp);
-            ImGui::Checkbox("Money", &overlay::moneyEsp);
         }
         else if (activeTab == MenuTab::Config) {
             ImGui::Spacing();
