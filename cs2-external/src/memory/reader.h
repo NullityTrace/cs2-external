@@ -55,6 +55,7 @@ public:
 	Vector3 world_to_screen(Vector3* v);
     void init();
     void loop();
+	std::string readString(uintptr_t address, size_t maxSize = 128);
 
 private:
 	view_matrix_t view_matrix;

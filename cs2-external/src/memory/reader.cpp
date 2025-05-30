@@ -38,6 +38,19 @@ void Reader::init() {
     }
 }
 
+std::string Reader::readString(uintptr_t address, size_t maxSize) {
+	char buffer[128]{};
+
+	if (address && address > 0x10000 && address < 0x7FFFFFFFFFFF) {
+		if (process->read_raw(address, buffer, maxSize)) {
+			return std::string(buffer);
+		}
+	}
+	return {};
+}
+
+
+
 void Reader::loop() {
     std::lock_guard<std::mutex> lock(reader_mutex);
     inGame = false;
@@ -92,10 +105,7 @@ void Reader::loop() {
 
 
 		playerNameData = process->read<uintptr_t>(player.entity + offsets::netvars::m_sSanitizedPlayerName);
-		char buffer[256];
-		process->read_raw(playerNameData, buffer, sizeof(buffer));
-		std::string name = std::string(buffer);
-		player.name = name;
+		player.name = readString(playerNameData);
 
 		player.gameSceneNode = process->read<uintptr_t>(player.pCSPlayerPawn + offsets::netvars::m_pGameSceneNode);
 		player.origin = process->read<Vector3>(player.pCSPlayerPawn + offsets::netvars::m_vOldOrigin);

@@ -1,7 +1,16 @@
 #pragma once
+
 #include <windows.h>
 #include <tlhelp32.h>
 #include <iostream>
+#include <vector>
+#include <math.h>
+#include <string>
+#include <Psapi.h> 
+
+typedef NTSTATUS(WINAPI* pNtReadVirtualMemory)(HANDLE ProcessHandle, PVOID BaseAddress, PVOID Buffer, ULONG NumberOfBytesToRead, PULONG NumberOfBytesRead);
+typedef NTSTATUS(WINAPI* pNtWriteVirtualMemory)(HANDLE ProcessHandle, PVOID BaseAddress, PVOID Buffer, ULONG NumberOfBytesToWrite, PULONG NumberOfBytesWritten);
+
 
 struct ProcessModule {
     uintptr_t base, size;
@@ -23,20 +32,23 @@ public:
     template <typename T>
     T read(uintptr_t address) {
         T buffer{};
-        SIZE_T bytesRead = 0;
-
-        if (!ReadProcessMemory(handle_, reinterpret_cast<LPCVOID>(address), &buffer, sizeof(T), &bytesRead)) {
+        if (!read_raw(address, &buffer, sizeof(T))) {
             DWORD error = GetLastError();
-            std::cerr << "[!] ReadProcessMemory failed at 0x" << std::hex << address
+            std::cerr << "[!] read_raw failed at 0x" << std::hex << address
                 << " | Error: " << std::dec << error << std::endl;
         }
-        else if (bytesRead != sizeof(T)) {
-            std::cerr << "[!] Incomplete read at 0x" << std::hex << address
-                << " | Expected: " << sizeof(T) << ", Got: " << bytesRead << std::endl;
-        }
-
         return buffer;
     }
 
     HWND findMainWindow();
+};
+
+class pMemory {
+
+public:
+    pMemory() {
+        pfnNtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtReadVirtualMemory");
+    }
+
+    pNtReadVirtualMemory pfnNtReadVirtualMemory;
 };
