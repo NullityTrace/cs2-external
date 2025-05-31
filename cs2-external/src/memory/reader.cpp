@@ -82,10 +82,10 @@ void Reader::loop() {
 		playerIndex++;
 		list_entry = process->read<uintptr_t>(entity_list + (8 * (playerIndex & 0x7FFF) >> 9) + 16);
 		if (!list_entry) break;
-
+		
 		player.entity = process->read<uintptr_t>(list_entry + 120 * (playerIndex & 0x1FF));
 		if (!player.entity) continue;
-
+		/*
 		player.team = process->read<int>(player.entity + offsets::netvars::m_iTeamNum);
 		if (overlay::teamEsp && (player.team == localTeam)) continue;
 
@@ -128,7 +128,7 @@ void Reader::loop() {
 			player.boneArray = process->read<uintptr_t>(player.gameSceneNode + 0x1F0);
 			player.ReadHead();
 		}
-
+		*/
 		list.push_back(player);
 	}
 
