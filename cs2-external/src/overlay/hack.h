@@ -57,9 +57,61 @@ namespace hack {
 					player->bones.bonePositions["head"].x,
 					player->bones.bonePositions["head"].y - width / 12,
 					width / 5,
-					IM_COL32(225, 75, 75, 255)
+					reader.localTeam == player->team ? IM_COL32(0, 0, 225, 255) : IM_COL32(225, 75, 75, 255)
 				);
 			}
+
+			if (overlay::skeletonEsp) {
+				for (const auto& connection : boneConnections) {
+					const std::string& boneFrom = connection.first;
+					const std::string& boneTo = connection.second;
+
+					gui::DrawLine(
+						player->bones.bonePositions[boneFrom].x, player->bones.bonePositions[boneFrom].y,
+						player->bones.bonePositions[boneTo].x, player->bones.bonePositions[boneTo].y,
+						reader.localTeam == player->team ? IM_COL32(0, 0, 225, 255) : IM_COL32(225, 75, 75, 255)
+					);
+				}
+			}
+
+			if (overlay::boxEsp)
+			{
+				gui::DrawBorderBox(
+					screenHead.x - width / 2,
+					screenHead.y,
+					width,
+					height,
+					(reader.localTeam == player->team ? IM_COL32(0, 0, 225, 255) : IM_COL32(225, 75, 75, 255))
+				);
+			}
+
+			if (overlay::armorEsp)
+			{
+				gui::DrawBorderBox(
+					screenHead.x - (width / 2 + 10),
+					screenHead.y + (height * (100 - player->armor) / 100),
+					2,
+					height - (height * (100 - player->armor) / 100),
+					IM_COL32(0, 185, 255, 255)
+				);
+			}
+			
+			if (overlay::hpEsp) {
+				gui::DrawBorderBox(
+					screenHead.x - (width / 2 + 5),
+					screenHead.y + (height * (100 - player->health) / 100),
+					2,
+					height - (height * (100 - player->health) / 100),
+					IM_COL32(
+						(255 - player->health),      
+						(55 + player->health * 2),    
+						75,                           
+						255                            
+					)
+				);
+			}
+			
+
 
 
 			if (roundedDistance > overlay::flag_render_distance)
