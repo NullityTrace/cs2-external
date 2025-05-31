@@ -4,6 +4,7 @@
 #include "../updater/offsets.h"
 #include "reader.h"
 #include "../overlay/overlay.h"
+#include "../gui/gui.h"
 
 void Reader::init() {
     HandleInspector inspector;
@@ -26,30 +27,29 @@ void Reader::init() {
                 }
             } while (base_client.base == 0 || base_engine.base == 0);
 
-            std::cout << "[cs2] base_engine.base: 0x" << std::hex << base_engine.base << std::endl;
-            std::cout << "[cs2] dwBuildNumber offset: 0x" << std::hex << offsets::engine::dwBuildNumber << std::endl;
-
-            uintptr_t address = base_engine.base + offsets::engine::dwBuildNumber;
-            std::cout << "[cs2] Final read address: 0x" << std::hex << address << std::endl;
-
-            uintptr_t buildNum = process->read<uintptr_t>(address);
-            std::cout << "[cs2] BuildNumber: " << std::dec << buildNum << std::endl;
+			GetClientRect(process->hwnd_, &game_bounds);
+			std::cout << "[DEBUG] game_bounds.right: " << game_bounds.right
+				<< ", game_bounds.bottom: " << game_bounds.bottom << std::endl;
         }
     }
 }
 
-std::string Reader::readString(uintptr_t address, size_t maxSize) {
-	char buffer[128]{};
+HWND FindMainWindow(DWORD pid) {
+	HWND result = nullptr;
 
-	if (address && address > 0x10000 && address < 0x7FFFFFFFFFFF) {
-		if (process->read_raw(address, buffer, maxSize)) {
-			return std::string(buffer);
+	EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
+		DWORD windowPid = 0;
+		GetWindowThreadProcessId(hwnd, &windowPid);
+
+		if (windowPid == (DWORD)lParam && IsWindowVisible(hwnd) && GetWindow(hwnd, GW_OWNER) == nullptr) {
+			*((HWND*)(&lParam)) = hwnd;
+			return FALSE;
 		}
-	}
-	return {};
+		return TRUE;
+		}, (LPARAM)&result);
+
+	return result;
 }
-
-
 
 void Reader::loop() {
     std::lock_guard<std::mutex> lock(reader_mutex);
@@ -78,14 +78,13 @@ void Reader::loop() {
     Player player;
 	uintptr_t list_entry, list_entry2, playerPawn, playerMoneyServices, clippingWeapon, weaponData, playerNameData;
 
-	while (true) {
-		playerIndex++;
-		list_entry = process->read<uintptr_t>(entity_list + (8 * (playerIndex & 0x7FFF) >> 9) + 16);
+	for(int i= 1; i<64; i++){
+		list_entry = process->read<uintptr_t>(entity_list + (8 * (i & 0x7FFF) >> 9) + 16);
 		if (!list_entry) break;
 		
-		player.entity = process->read<uintptr_t>(list_entry + 120 * (playerIndex & 0x1FF));
+		player.entity = process->read<uintptr_t>(list_entry + 120 * (i & 0x1FF));
 		if (!player.entity) continue;
-		/*
+		
 		player.team = process->read<int>(player.entity + offsets::netvars::m_iTeamNum);
 		if (overlay::teamEsp && (player.team == localTeam)) continue;
 
@@ -104,8 +103,8 @@ void Reader::loop() {
 		if (overlay::teamEsp && (player.pCSPlayerPawn == localPlayer)) continue;
 
 
-		playerNameData = process->read<uintptr_t>(player.entity + offsets::netvars::m_sSanitizedPlayerName);
-		player.name = readString(playerNameData);
+		//playerNameData = process->read<uintptr_t>(player.entity + offsets::netvars::m_sSanitizedPlayerName);
+		//player.name = readString(playerNameData);
 
 		player.gameSceneNode = process->read<uintptr_t>(player.pCSPlayerPawn + offsets::netvars::m_pGameSceneNode);
 		player.origin = process->read<Vector3>(player.pCSPlayerPawn + offsets::netvars::m_vOldOrigin);
@@ -127,8 +126,11 @@ void Reader::loop() {
 			player.gameSceneNode = process->read<uintptr_t>(player.pCSPlayerPawn + offsets::netvars::m_pGameSceneNode);
 			player.boneArray = process->read<uintptr_t>(player.gameSceneNode + 0x1F0);
 			player.ReadHead();
+			
 		}
-		*/
+
+		
+
 		list.push_back(player);
 	}
 

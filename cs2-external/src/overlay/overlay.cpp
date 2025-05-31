@@ -3,7 +3,7 @@
 #include "../../include/imgui/imgui_impl_dx11.h"
 #include "../../include/imgui/imgui_impl_win32.h"
 #include "../gui/gui.h"
-
+#include "hack.h"
 #include <dwmapi.h>
 #include <d3dx11.h>
 
@@ -90,7 +90,8 @@ void overlay::render()
             SetWindowLong(hwnd, GWL_EXSTYLE, WS_EX_TOPMOST | WS_EX_TRANSPARENT | WS_EX_LAYERED);
         }
 
-        //hack::loop();
+        hack::loop();
+
 
         ImGui::Render();
 

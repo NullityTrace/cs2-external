@@ -1,4 +1,6 @@
 #include "HandleInspector.h"
+#include "pProcess.h"
+
 
 DWORD HandleInspector::GetPidByName(const std::wstring& processName) {
     DWORD pid = 0;
@@ -31,6 +33,24 @@ std::wstring HandleInspector::GetProcessName(DWORD pid) {
     }
     CloseHandle(hProc);
     return L"<Unknown>";
+}
+
+
+HWND GetWindowHandleFromProcessId(DWORD ProcessId) {
+    HWND hwnd = NULL;
+    do {
+        hwnd = FindWindowEx(NULL, hwnd, NULL, NULL);
+        DWORD pid = 0;
+        GetWindowThreadProcessId(hwnd, &pid);
+        if (pid == ProcessId) {
+            TCHAR windowTitle[MAX_PATH];
+            GetWindowText(hwnd, windowTitle, MAX_PATH);
+            if (IsWindowVisible(hwnd) && windowTitle[0] != '\0') {
+                return hwnd;
+            }
+        }
+    } while (hwnd != NULL);
+    return NULL; 
 }
 
 bool HandleInspector::FindHandlesToProcess(const std::wstring& targetProcessName) {
@@ -102,8 +122,3 @@ void HandleInspector::CloseDuplicatedHandle() {
         duplicatedHandle_ = nullptr;
     }
 }
-
-
-
-
-

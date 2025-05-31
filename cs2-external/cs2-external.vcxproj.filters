@@ -107,5 +107,8 @@
     <ClInclude Include="src\memory\vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\overlay\hack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

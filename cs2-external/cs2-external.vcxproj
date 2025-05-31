@@ -185,6 +185,7 @@ advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClInclude Include="src\memory\pProcess.h" />
     <ClInclude Include="src\memory\reader.h" />
     <ClInclude Include="src\memory\vector.h" />
+    <ClInclude Include="src\overlay\hack.h" />
     <ClInclude Include="src\overlay\overlay.h" />
     <ClInclude Include="src\updater\offsets.h" />
   </ItemGroup>
