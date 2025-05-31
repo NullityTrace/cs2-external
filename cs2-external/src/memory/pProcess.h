@@ -11,6 +11,16 @@
 typedef NTSTATUS(WINAPI* pNtReadVirtualMemory)(HANDLE ProcessHandle, PVOID BaseAddress, PVOID Buffer, ULONG NumberOfBytesToRead, PULONG NumberOfBytesRead);
 typedef NTSTATUS(WINAPI* pNtWriteVirtualMemory)(HANDLE ProcessHandle, PVOID BaseAddress, PVOID Buffer, ULONG NumberOfBytesToWrite, PULONG NumberOfBytesWritten);
 
+class pMemory {
+
+public:
+    pMemory() {
+        pfnNtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtReadVirtualMemory");
+    }
+
+    pNtReadVirtualMemory pfnNtReadVirtualMemory;
+};
+
 
 struct ProcessModule {
     uintptr_t base, size;
@@ -29,26 +39,17 @@ public:
 
     ProcessModule GetModule(const char* module_name);
 
-    template <typename T>
-    T read(uintptr_t address) {
+    template<class T>
+    T read(uintptr_t address)
+    {
         T buffer{};
-        if (!read_raw(address, &buffer, sizeof(T))) {
-            DWORD error = GetLastError();
-            std::cerr << "[!] read_raw failed at 0x" << std::hex << address
-                << " | Error: " << std::dec << error << std::endl;
-        }
+        pMemory cMemory;
+
+        cMemory.pfnNtReadVirtualMemory(handle_, (void*)address, &buffer, sizeof(T), 0);
         return buffer;
     }
 
     HWND findMainWindow();
 };
 
-class pMemory {
 
-public:
-    pMemory() {
-        pfnNtReadVirtualMemory = (pNtReadVirtualMemory)GetProcAddress(GetModuleHandleA("ntdll.dll"), "NtReadVirtualMemory");
-    }
-
-    pNtReadVirtualMemory pfnNtReadVirtualMemory;
-};

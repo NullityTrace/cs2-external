@@ -25,3 +25,4 @@ bool pProcess::read_raw(uintptr_t address, void* buffer, size_t size) {
 
     return bytesRead == size;
 }
+
