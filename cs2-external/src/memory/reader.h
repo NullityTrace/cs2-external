@@ -53,6 +53,7 @@ public:
 	std::vector<Player> players = {};
 	RECT game_bounds;
 	Vector3 world_to_screen(Vector3* v);
+	HWND GetWindowHandleFromProcessId(DWORD ProcessId);
     void init();
     void loop();
 

@@ -6,6 +6,22 @@
 #include "../overlay/overlay.h"
 #include "../gui/gui.h"
 
+HWND Reader::GetWindowHandleFromProcessId(DWORD ProcessId) {
+	HWND hwnd = NULL;
+	do {
+		hwnd = FindWindowEx(NULL, hwnd, NULL, NULL);
+		DWORD pid = 0;
+		GetWindowThreadProcessId(hwnd, &pid);
+		if (pid == ProcessId) {
+			TCHAR windowTitle[MAX_PATH];
+			GetWindowText(hwnd, windowTitle, MAX_PATH);
+			if (IsWindowVisible(hwnd) && windowTitle[0] != '\0') {
+				return hwnd;
+			}
+		}
+	} while (hwnd != NULL);
+	return NULL;
+}
 void Reader::init() {
     HandleInspector inspector;
     if (inspector.FindHandlesToProcess(L"cs2.exe")) {
@@ -27,6 +43,8 @@ void Reader::init() {
                 }
             } while (base_client.base == 0 || base_engine.base == 0);
 
+			process->hwnd_ = this->GetWindowHandleFromProcessId(pid);
+
 			GetClientRect(process->hwnd_, &game_bounds);
 			std::cout << "[DEBUG] game_bounds.right: " << game_bounds.right
 				<< ", game_bounds.bottom: " << game_bounds.bottom << std::endl;
@@ -34,22 +52,7 @@ void Reader::init() {
     }
 }
 
-HWND FindMainWindow(DWORD pid) {
-	HWND result = nullptr;
 
-	EnumWindows([](HWND hwnd, LPARAM lParam) -> BOOL {
-		DWORD windowPid = 0;
-		GetWindowThreadProcessId(hwnd, &windowPid);
-
-		if (windowPid == (DWORD)lParam && IsWindowVisible(hwnd) && GetWindow(hwnd, GW_OWNER) == nullptr) {
-			*((HWND*)(&lParam)) = hwnd;
-			return FALSE;
-		}
-		return TRUE;
-		}, (LPARAM)&result);
-
-	return result;
-}
 
 void Reader::loop() {
     std::lock_guard<std::mutex> lock(reader_mutex);
