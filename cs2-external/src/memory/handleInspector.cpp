@@ -56,7 +56,6 @@ HWND GetWindowHandleFromProcessId(DWORD ProcessId) {
 bool HandleInspector::FindHandlesToProcess(const std::wstring& targetProcessName) {
     DWORD targetPid = GetPidByName(targetProcessName);
     if (!targetPid) {
-        std::wcout << L"[!] Process not found: " << targetProcessName << std::endl;
         return false;
     }
 
@@ -92,9 +91,6 @@ bool HandleInspector::FindHandlesToProcess(const std::wstring& targetProcessName
 
             DWORD foundPid = GetProcessId(dupHandle);
             if (foundPid == targetPid) {
-                std::wcout << L"[+] Found duplicated handle to " << targetProcessName
-                    << L" (PID: " << foundPid << L") from process PID: " << h.ProcessId << std::endl;
-
                 duplicatedHandle_ = dupHandle;
                 duplicatedPid_ = foundPid;
                 CloseHandle(hProcess);

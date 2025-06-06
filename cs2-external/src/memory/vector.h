@@ -51,6 +51,10 @@ struct Vector3
 		return x <= other.x && y <= other.y && z <= other.z;
 	}
 
+	constexpr bool operator==(const Vector3& other) const noexcept {
+		return x == other.x && y == other.y && z == other.z;
+	}
+
 	// utils
 	constexpr const Vector3& ToAngle() const noexcept
 	{

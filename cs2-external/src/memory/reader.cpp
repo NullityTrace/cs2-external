@@ -29,16 +29,12 @@ void Reader::init() {
         DWORD pid = inspector.GetDuplicatedPid();
 
         if (hCs2 && pid) {
-            std::wcout << L"[cs2] Handle duplicado com sucesso! Handle: " << hCs2 << std::endl;
-
             process = std::make_shared<pProcess>(pid, hCs2);
-
             do {
                 base_client = process->GetModule("client.dll");
                 base_engine = process->GetModule("engine2.dll");
 
                 if (base_client.base == 0 || base_engine.base == 0) {
-                    std::cout << "[cs2] Aguardando client.dll/engine2.dll serem carregadas..." << std::endl;
                     std::this_thread::sleep_for(std::chrono::seconds(1));
                 }
             } while (base_client.base == 0 || base_engine.base == 0);
@@ -46,8 +42,6 @@ void Reader::init() {
 			process->hwnd_ = this->GetWindowHandleFromProcessId(pid);
 
 			GetClientRect(process->hwnd_, &game_bounds);
-			std::cout << "[DEBUG] game_bounds.right: " << game_bounds.right
-				<< ", game_bounds.bottom: " << game_bounds.bottom << std::endl;
         }
     }
 }
@@ -81,61 +75,57 @@ void Reader::loop() {
     Player player;
 	uintptr_t list_entry, list_entry2, playerPawn, playerMoneyServices, clippingWeapon, weaponData, playerNameData;
 
-	for(int i= 1; i<64; i++){
-		list_entry = process->read<uintptr_t>(entity_list + (8 * (i & 0x7FFF) >> 9) + 16);
-		if (!list_entry) break;
-		
-		player.entity = process->read<uintptr_t>(list_entry + 120 * (i & 0x1FF));
-		if (!player.entity) continue;
-		
-		player.team = process->read<int>(player.entity + offsets::netvars::m_iTeamNum);
-		if (overlay::teamEsp && (player.team == localTeam)) continue;
+    for (int i = 1; i < 64; ++i) {
+        uintptr_t list_entry = process->read<uintptr_t>(entity_list + (8 * (i & 0x7FFF) >> 9) + 16);
+        if (!list_entry) break;
 
-		playerPawn = process->read<std::uint32_t>(player.entity + offsets::netvars::m_hPlayerPawn);
+        uintptr_t entity = process->read<uintptr_t>(list_entry + 120 * (i & 0x1FF));
+        if (!entity) continue;
 
-		list_entry2 = process->read<uintptr_t>(entity_list + 0x8 * ((playerPawn & 0x7FFF) >> 9) + 16);
-		if (!list_entry2) continue;
+        int team = process->read<int>(entity + offsets::netvars::m_iTeamNum);
+        if (overlay::teamEsp && (team == localTeam)) continue;
 
-		player.pCSPlayerPawn = process->read<uintptr_t>(list_entry2 + 120 * (playerPawn & 0x1FF));
-		if (!player.pCSPlayerPawn) continue;
+        std::uint32_t playerPawn = process->read<std::uint32_t>(entity + offsets::netvars::m_hPlayerPawn);
 
-		player.health = process->read<int>(player.pCSPlayerPawn + offsets::netvars::m_iHealth);
-		player.armor = process->read<int>(player.pCSPlayerPawn + offsets::netvars::m_ArmorValue);
-		if (player.health <= 0 || player.health > 100) continue;
+        uintptr_t list_entry2 = process->read<uintptr_t>(entity_list + 0x8 * ((playerPawn & 0x7FFF) >> 9) + 16);
+        if (!list_entry2) continue;
 
-		if (overlay::teamEsp && (player.pCSPlayerPawn == localPlayer)) continue;
+        uintptr_t pCSPlayerPawn = process->read<uintptr_t>(list_entry2 + 120 * (playerPawn & 0x1FF));
+        if (!pCSPlayerPawn) continue;
 
+        int health = process->read<int>(pCSPlayerPawn + offsets::netvars::m_iHealth);
+        if (health <= 0 || health > 100) continue;
 
-		//playerNameData = process->read<uintptr_t>(player.entity + offsets::netvars::m_sSanitizedPlayerName);
-		//player.name = readString(playerNameData);
+        if (overlay::teamEsp && (pCSPlayerPawn == localPlayer)) continue;
 
-		player.gameSceneNode = process->read<uintptr_t>(player.pCSPlayerPawn + offsets::netvars::m_pGameSceneNode);
-		player.origin = process->read<Vector3>(player.pCSPlayerPawn + offsets::netvars::m_vOldOrigin);
-		player.head = { player.origin.x, player.origin.y, player.origin.z + 75.f };
+        uintptr_t gameSceneNode = process->read<uintptr_t>(pCSPlayerPawn + offsets::netvars::m_pGameSceneNode);
+        Vector3 origin = process->read<Vector3>(pCSPlayerPawn + offsets::netvars::m_vOldOrigin);
 
-		if (player.origin.x == localOrigin.x && player.origin.y == localOrigin.y && player.origin.z == localOrigin.z)
-			continue;
+        if (origin == localOrigin || origin.x == 0 || origin.y == 0) continue;
+        if (overlay::render_distance != -1 && (localOrigin - origin).length2d() > overlay::render_distance) continue;
 
-		if (overlay::render_distance != -1 && (localOrigin - player.origin).length2d() > overlay::render_distance) continue;
-		if (player.origin.x == 0 && player.origin.y == 0) continue;
+        Player player;
+        player.entity = entity;
+        player.team = team;
+        player.pCSPlayerPawn = pCSPlayerPawn;
+        player.health = health;
+        player.origin = origin;
+        player.head = { origin.x, origin.y, origin.z + 75.f };
+        player.armor = process->read<int>(pCSPlayerPawn + offsets::netvars::m_ArmorValue);
 
-		if (overlay::skeletonEsp) {
-			player.gameSceneNode = process->read<uintptr_t>(player.pCSPlayerPawn + offsets::netvars::m_pGameSceneNode);
-			player.boneArray = process->read<uintptr_t>(player.gameSceneNode + 0x1F0);
-			player.ReadBones();
-		}
+        player.gameSceneNode = gameSceneNode;
 
-		if (overlay::dotEsp && !overlay::skeletonEsp) {
-			player.gameSceneNode = process->read<uintptr_t>(player.pCSPlayerPawn + offsets::netvars::m_pGameSceneNode);
-			player.boneArray = process->read<uintptr_t>(player.gameSceneNode + 0x1F0);
-			player.ReadHead();
-			
-		}
+        if (overlay::skeletonEsp || overlay::dotEsp) {
+            player.boneArray = process->read<uintptr_t>(gameSceneNode + 0x1F0);
+            if (overlay::skeletonEsp)
+                player.ReadBones();
+            else
+                player.ReadHead();
+        }
 
-		
+        list.push_back(player);
+    }
 
-		list.push_back(player);
-	}
 
 	players.clear();
 	players.assign(list.begin(), list.end());
